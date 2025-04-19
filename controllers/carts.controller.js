@@ -58,7 +58,7 @@ async function addProductToCart(req,res){
         await currentCart.save();
         //? update the user cart too
         await User.updateOne({_id:req.user._id},{$push:{cart:{productId,quantity}}});
-        return res.status(200).send({success:STATUS.SUCCESS,message:"Product added to cart successfully",data:currentCart});
+        return res.status(201).send({success:STATUS.SUCCESS,message:"Product added to cart successfully",data:currentCart});
 
     }catch(error){
         return res.status(500).send({success:STATUS.ERROR,message:error.message});
@@ -94,6 +94,9 @@ async function updateSpecificProductInCart(req,res){
 async function deleteSpecificProductInCart(req,res){
     try{
         const id =req.params.id;
+        const userHasTheProduct=await User.find({_id:req.user._id,"cart.products":{productId:id}});
+        if(!userHasTheProduct)
+            return res.status(403).send({status:STATUS.FORBIDDEN,message:"You can not delete product not found in the cart"});
         const cart=await Cart.findOneAndUpdate({userId:req.user._id},{$pull:{products:{productId:id}}},{new:true,runValidators:true});
         if(!cart){
             return res.status(404).send({success:STATUS.ERROR,message:"cart not found"});

@@ -68,7 +68,7 @@ async function createOrder(req,res){
             }
           );
 
-        return res.status(200).send({status:STATUS.SUCCESS,message:"Order created successfuly",data:order});
+        return res.status(201).send({status:STATUS.SUCCESS,message:"Order created successfuly",data:order});
 
         //! when payment done(the order status change and the products affected too) 
 
